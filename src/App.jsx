@@ -3,6 +3,8 @@ import LoadingSpinner from './components/LoadingSpinner';
 import ErrorMessage from './components/ErrorMessage';
 import EmptyState from './components/EmptyState';
 import NewsGrid from './components/NewsGrid';
+import SearchBar from './components/SearchBar';
+import SearchInfo from './components/SearchInfo';
 
 function App() {
   const {
@@ -10,7 +12,9 @@ function App() {
     loading,
     error,
     totalResults,
+    searchQuery,
     selectedCategory,
+    handleSearch,
     refreshNews,
   } = useNews();
 
@@ -19,7 +23,7 @@ function App() {
       {/* Header */}
       <header className="bg-white dark:bg-gray-800 shadow-md sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between mb-4">
             <div>
               <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white flex items-center">
                 <span className="mr-2">📰</span>
@@ -48,9 +52,18 @@ function App() {
             </button>
           </div>
 
+          {/* Search Bar */}
+          <div className="mb-4">
+            <SearchBar 
+              onSearch={handleSearch} 
+              initialValue={searchQuery}
+              placeholder="Search for news articles..."
+            />
+          </div>
+
           {/* Stats Bar */}
-          {!loading && !error && totalResults > 0 && (
-            <div className="mt-4 flex items-center gap-4 text-sm">
+          {!loading && !error && totalResults > 0 && !searchQuery && (
+            <div className="flex items-center gap-4 text-sm">
               <div className="flex items-center text-gray-600 dark:text-gray-400">
                 <span className="font-semibold text-gray-900 dark:text-white mr-1">
                   {totalResults.toLocaleString()}
@@ -71,14 +84,29 @@ function App() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Search Results Info */}
+        {!loading && !error && searchQuery && (
+          <div className="mb-6">
+            <SearchInfo 
+              searchQuery={searchQuery}
+              totalResults={totalResults}
+              resultsCount={articles.length}
+            />
+          </div>
+        )}
+
         {loading && <LoadingSpinner message="Fetching latest news..." />}
 
         {error && <ErrorMessage message={error} onRetry={refreshNews} />}
 
         {!loading && !error && articles.length === 0 && (
           <EmptyState
-            message="No articles found"
-            description="Try adjusting your search criteria or check back later for new content."
+            message={searchQuery ? `No results found for "${searchQuery}"` : "No articles found"}
+            description={
+              searchQuery 
+                ? "Try different keywords or check your spelling."
+                : "Try adjusting your search criteria or check back later for new content."
+            }
           />
         )}
 
