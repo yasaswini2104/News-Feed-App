@@ -5,6 +5,8 @@ import EmptyState from './components/EmptyState';
 import NewsGrid from './components/NewsGrid';
 import SearchBar from './components/SearchBar';
 import SearchInfo from './components/SearchInfo';
+import CategoryFilter from './components/CategoryFilter';
+import ActiveFilters from './components/ActiveFilters';
 
 function App() {
   const {
@@ -15,8 +17,17 @@ function App() {
     searchQuery,
     selectedCategory,
     handleSearch,
+    handleCategoryChange,
     refreshNews,
   } = useNews();
+
+  const handleClearSearch = () => {
+    handleSearch('');
+  };
+
+  const handleClearCategory = () => {
+    handleCategoryChange('general');
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -61,9 +72,18 @@ function App() {
             />
           </div>
 
+          {/* Category Filter */}
+          <div className="mb-4">
+            <CategoryFilter
+              selectedCategory={selectedCategory}
+              onCategoryChange={handleCategoryChange}
+              disabled={loading}
+            />
+          </div>
+
           {/* Stats Bar */}
           {!loading && !error && totalResults > 0 && !searchQuery && (
-            <div className="flex items-center gap-4 text-sm">
+            <div className="flex items-center gap-4 text-sm pt-4 border-t border-gray-200 dark:border-gray-700">
               <div className="flex items-center text-gray-600 dark:text-gray-400">
                 <span className="font-semibold text-gray-900 dark:text-white mr-1">
                   {totalResults.toLocaleString()}
@@ -72,9 +92,9 @@ function App() {
               </div>
               <div className="h-4 w-px bg-gray-300 dark:bg-gray-600"></div>
               <div className="flex items-center text-gray-600 dark:text-gray-400">
-                Category: 
-                <span className="font-semibold text-gray-900 dark:text-white ml-1 capitalize">
-                  {selectedCategory}
+                Showing: 
+                <span className="font-semibold text-gray-900 dark:text-white ml-1">
+                  {articles.length} articles
                 </span>
               </div>
             </div>
@@ -84,8 +104,20 @@ function App() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Active Filters */}
+        {!loading && !error && (
+          <div className="mb-6">
+            <ActiveFilters
+              searchQuery={searchQuery}
+              selectedCategory={selectedCategory}
+              onClearSearch={handleClearSearch}
+              onClearCategory={handleClearCategory}
+            />
+          </div>
+        )}
+
         {/* Search Results Info */}
-        {!loading && !error && searchQuery && (
+        {!loading && !error && searchQuery && articles.length > 0 && (
           <div className="mb-6">
             <SearchInfo 
               searchQuery={searchQuery}
@@ -105,7 +137,7 @@ function App() {
             description={
               searchQuery 
                 ? "Try different keywords or check your spelling."
-                : "Try adjusting your search criteria or check back later for new content."
+                : "Try adjusting your filters or check back later for new content."
             }
           />
         )}
@@ -121,7 +153,7 @@ function App() {
       <footer className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 mt-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <p className="text-center text-gray-600 dark:text-gray-400 text-sm">
-            Powered by News API • Built with React & Tailwind CSS
+            Powered by News API • Built with React & Tailwind CSS ~ Yasaswini
           </p>
         </div>
       </footer>
